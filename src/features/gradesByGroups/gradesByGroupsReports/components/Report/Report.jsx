@@ -12,6 +12,7 @@ import { InputIcon } from 'primereact/inputicon';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
+import {ukraineDate} from '../../../../../shared/utils/utils.js'
 import * as XLSX from 'xlsx';
 
 function Report() {
@@ -28,14 +29,14 @@ function Report() {
   const headerGroup = (
     <ColumnGroup>
       <Row>
-        <Column headerClassName="bg-blue-700" header="ПІБ" rowSpan={3} />
+        <Column headerClassName="bg-blue-700 text-white" header="ПІБ" rowSpan={3} />
         {groups?.map(({ name, control_dates, assigment_dates }, index) => {
           return [
             <Column key={name} header={`${name}`} colSpan={control_dates?.length + assigment_dates?.length} />,
-            <Column headerClassName="bg-green-800" key={name + index} header={`Середнє: ${name}`} rowSpan={3} />,
+            <Column headerClassName="bg-green-800 text-white" key={name + index} header={`Середнє: ${name}`} rowSpan={3} />,
           ];
         })}
-        <Column headerClassName="bg-orange-800" header="Середнє по групам" rowSpan={3} />
+        <Column headerClassName="bg-orange-800 text-white" header="Середнє по групам" rowSpan={3} />
       </Row>
       <Row>
         {groups?.flatMap(({ _id, assigment_dates, control_dates }) => {
@@ -54,10 +55,10 @@ function Report() {
       <Row>
         {groups?.flatMap(({ _id, control_dates, assigment_dates }) => [
           ...assigment_dates?.map((date, index) => (
-            <Column key={`${_id}-assigment-${index}`} header={new Date(date).toLocaleDateString('uk')} />
+            <Column key={`${_id}-assigment-${index}`} header={ukraineDate(date)} />
           )),
           ...control_dates?.map((date, index) => (
-            <Column key={`${_id}-control-${index}`} header={new Date(date).toLocaleDateString('uk')} />
+            <Column key={`${_id}-control-${index}`} header={ukraineDate(date)} />
           )),
         ])}
       </Row>
@@ -72,11 +73,11 @@ function Report() {
       type === 'control'
         ? group.controls?.filter(
           ({ date: controlDate }) => {
-            return controlDate === new Date(date).toLocaleDateString('uk')
+            return controlDate === ukraineDate(date)
           }
         )
         : group.assigments?.filter(
-          ({ date: assigmentDate }) => assigmentDate === new Date(date).toLocaleDateString('uk')
+          ({ date: assigmentDate }) => assigmentDate === ukraineDate(date)
         );
 
     if (!ratings || ratings.length === 0) return null;
@@ -131,7 +132,7 @@ function Report() {
       }
 
       headerRow2.push('Середнє за групу');
-      headerRow3.push(...groupDates.map((date) => new Date(date).toLocaleDateString('uk')), '');
+      headerRow3.push(...groupDates.map((date) => ukraineDate(date)), '');
     });
 
     headerRow1.push('Середнє по групам');
@@ -145,10 +146,16 @@ function Report() {
       const row = [rowData.name];
       groups.forEach(({ name, control_dates, assigment_dates }) => {
         [...(assigment_dates || []), ...(control_dates || [])].forEach((date) => {
+          console.log('date', date);
+          
           const value = rowData.groups
             ?.find((group) => group.group === name)
             ?.controls?.concat(rowData.groups?.find((group) => group.group === name)?.assigments || [])
-            ?.find((rating) => new Date(rating.date).toLocaleDateString('uk') === new Date(date).toLocaleDateString('uk'))
+            ?.find((rating) => {
+              console.log('rating.date', rating.date);
+              
+              return rating.date === ukraineDate(date)
+            })
             ?.rating || '';
           row.push(value);
         });
@@ -219,7 +226,7 @@ function Report() {
         loading={isLoadingReport}
         value={report || []}
       >
-        <Column bodyClassName="bg-blue-900" header="ПІБ" field="name" />
+        <Column bodyClassName="bg-blue-900 text-white" header="ПІБ" field="name" />
         {groups?.flatMap(({ _id, name, control_dates, assigment_dates }) => [
           ...assigment_dates?.map((date, index) => (
             <Column

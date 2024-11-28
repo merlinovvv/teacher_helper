@@ -1,5 +1,4 @@
 import { jwtDecode } from 'jwt-decode';
-import { func } from 'prop-types';
 
 export function buildApiUrl(baseUrl, endpoint, parameters) {
   const hasParams = baseUrl.includes('?');
@@ -37,4 +36,13 @@ export function checkCodeStatus(status){
     localStorage.clear()
     window.location.reload()
   }
+}
+
+export function ukraineDate(date) {
+  return new Date(date).toLocaleDateString('uk-UA', {
+      timeZone: 'Europe/Kiev',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+  });
 }
