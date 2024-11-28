@@ -54,10 +54,10 @@ function Report() {
       <Row>
         {groups?.flatMap(({ _id, control_dates, assigment_dates }) => [
           ...assigment_dates?.map((date, index) => (
-            <Column key={`${_id}-assigment-${index}`} header={new Date(date).toLocaleDateString()} />
+            <Column key={`${_id}-assigment-${index}`} header={new Date(date).toLocaleDateString('uk')} />
           )),
           ...control_dates?.map((date, index) => (
-            <Column key={`${_id}-control-${index}`} header={new Date(date).toLocaleDateString()} />
+            <Column key={`${_id}-control-${index}`} header={new Date(date).toLocaleDateString('uk')} />
           )),
         ])}
       </Row>
@@ -71,14 +71,17 @@ function Report() {
     const ratings =
       type === 'control'
         ? group.controls?.filter(
-          ({ date: controlDate }) => new Date(controlDate).getTime() === new Date(date).getTime()
+          ({ date: controlDate }) => {
+            return controlDate === new Date(date).toLocaleDateString('uk')
+          }
         )
         : group.assigments?.filter(
-          ({ date: assigmentDate }) => new Date(assigmentDate).getTime() === new Date(date).getTime()
+          ({ date: assigmentDate }) => assigmentDate === new Date(date).toLocaleDateString('uk')
         );
 
     if (!ratings || ratings.length === 0) return null;
-
+        
+        
     return ratings.map((rating, index) => <div key={index}>{rating.rating}</div>);
   };
 
@@ -128,7 +131,7 @@ function Report() {
       }
 
       headerRow2.push('Середнє за групу');
-      headerRow3.push(...groupDates.map((date) => new Date(date).toLocaleDateString()), '');
+      headerRow3.push(...groupDates.map((date) => new Date(date).toLocaleDateString('uk')), '');
     });
 
     headerRow1.push('Середнє по групам');
@@ -145,7 +148,7 @@ function Report() {
           const value = rowData.groups
             ?.find((group) => group.group === name)
             ?.controls?.concat(rowData.groups?.find((group) => group.group === name)?.assigments || [])
-            ?.find((rating) => new Date(rating.date).getTime() === new Date(date).getTime())
+            ?.find((rating) => new Date(rating.date).toLocaleDateString('uk') === new Date(date).toLocaleDateString('uk'))
             ?.rating || '';
           row.push(value);
         });
