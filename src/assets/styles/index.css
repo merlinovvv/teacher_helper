@@ -1,0 +1,31 @@
+@import '../fonts/e-Ukraine/e-Ukraine.css';
+
+:root {
+  font-family: 'e-Ukraine', sans-serif;
+  --font-family: 'e-Ukraine', sans-serif!important;
+  font-size: 15px!important;
+  color-scheme: light dark;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.p-tabview {
+  background-color: var(--surface-50);
+  border-radius: 8px;
+}
+
+#root {
+  min-height: 100vh;
+  opacity: 1;
+  background-image: linear-gradient(var(--primary-500) 0.8px, transparent 0.8px), linear-gradient(90deg, var(--primary-500) 0.8px, transparent 0.8px), linear-gradient(var(--primary-500) 0.4px, transparent 0.4px), linear-gradient(90deg, var(--primary-500) 0.4px, var(--surface-200) 0.4px);
+  background-size: 20px 20px, 20px 20px, 4px 4px, 4px 4px;
+  background-position: -0.8px -0.8px, -0.8px -0.8px, -0.4px -0.4px, -0.4px -0.4px;
+}
