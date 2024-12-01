@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { useGetReport } from '../../data/useReport.js';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
@@ -12,8 +12,9 @@ import { InputIcon } from 'primereact/inputicon';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
-import {ukraineDate} from '../../../../../shared/utils/utils.js'
+import { ukraineDate } from '../../../../../shared/utils/utils.js'
 import * as XLSX from 'xlsx';
+import { reportTypes } from '../../../../../shared/utils/constants.js';
 
 function Report() {
   const { report_id } = useParams();
@@ -23,31 +24,35 @@ function Report() {
   const [reportWidth, setReportWidth] = useState();
   const [filters, setFilters] = useState({ global: { value: null, matchMode: FilterMatchMode.CONTAINS } });
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-  const { sidebarIsOpen } = useContext(LayoutContext);
+  const { sidebarIsOpen, toast } = useContext(LayoutContext);
   const { data: reportData, isFetching: isLoadingReport } = useGetReport(report_id);
 
   const headerGroup = (
     <ColumnGroup>
       <Row>
-        <Column headerClassName="bg-blue-700 text-white" header="ПІБ" rowSpan={3} />
+        <Column headerClassName="bg-blue-700 text-white text-center" header="ПІБ" rowSpan={3} />
         {groups?.map(({ name, control_dates, assigment_dates }, index) => {
           return [
-            <Column key={name} header={`${name}`} colSpan={control_dates?.length + assigment_dates?.length} />,
-            <Column headerClassName="bg-green-800 text-white" key={name + index} header={`Середнє: ${name}`} rowSpan={3} />,
+            <Column key={name} header={`${name}`} colSpan={(control_dates?.length && assigment_dates?.length) ? (control_dates?.length + 1 + assigment_dates?.length + 1) : assigment_dates?.length ? assigment_dates?.length + 1 : control_dates?.length ? control_dates?.length + 1 : 0} />,
+            <Column headerClassName="bg-green-800 text-white text-center" key={name + index} header={`Середнє: ${name}`} rowSpan={3} />,
           ];
         })}
-        <Column headerClassName="bg-orange-800 text-white" header="Середнє по групам" rowSpan={3} />
+        <Column headerClassName="bg-orange-800 text-white text-center" header="Середнє по групам" rowSpan={3} />
       </Row>
       <Row>
         {groups?.flatMap(({ _id, assigment_dates, control_dates }) => {
           let returnColumns = [];
           if (assigment_dates?.length) {
             returnColumns.push(
-              <Column key={`${_id}-assigment`} header="Поточне оцінювання" colSpan={assigment_dates?.length || 1} />
+              <Column key={`${_id}-assigment`} header="Поточне оцінювання" colSpan={assigment_dates?.length || 1} />,
+              <Column headerClassName="bg-cyan-600 text-white text-center" key={`avg-control`} header={`Середнє за поточні`} rowSpan={2} />,
             );
           }
           if (control_dates?.length) {
-            returnColumns.push(<Column key={`${_id}-control`} header="Підсумкові" colSpan={control_dates?.length} />);
+            returnColumns.push(
+              <Column key={`${_id}-control`} header="Підсумкові" colSpan={control_dates?.length} />,
+              <Column headerClassName="bg-yellow-600 text-white text-center" key={`avg-control`} header={`Середнє за підсумкові`} rowSpan={2} />,
+            );
           }
           return returnColumns;
         })}
@@ -73,17 +78,24 @@ function Report() {
       type === 'control'
         ? group.controls?.filter(
           ({ date: controlDate }) => {
+            if (!controlDate && !date) {
+              return true
+            }
             return controlDate === ukraineDate(date)
           }
         )
         : group.assigments?.filter(
-          ({ date: assigmentDate }) => assigmentDate === ukraineDate(date)
+          ({ date: assigmentDate }) => {
+            if (!assigmentDate && !date) {
+              return true
+            }
+            return assigmentDate === ukraineDate(date)
+          }
         );
 
     if (!ratings || ratings.length === 0) return null;
-        
-        
-    return ratings.map((rating, index) => <div key={index}>{rating.rating}</div>);
+
+    return ratings.map((rating, index) => <div key={index}>{rating.rating ? rating.rating : ''}</div>);
   };
 
   const onGlobalFilterChange = (e) => {
@@ -120,58 +132,94 @@ function Report() {
     const headerRow3 = [''];
 
     groups.forEach(({ name, control_dates, assigment_dates }) => {
-      const groupDates = [...(assigment_dates || []), ...(control_dates || [])];
+      let groupDates = [];
+      if (assigment_dates?.length) {
+        groupDates.push(...assigment_dates, '')
+      }
+      if (control_dates?.length) {
+        groupDates.push(...control_dates, '')
+      }
+      console.log(groupDates);
+
       headerRow1.push(name, ...Array(groupDates.length).fill(''));
-      
-      if (assigment_dates?.length !== 0 ) {
+
+      if (assigment_dates?.length !== 0) {
         headerRow2.push('Поточне оцінювання', ...Array(Math.max(assigment_dates?.length - 1, 0)).fill(''));
+        headerRow2.push('Середнє за поточні');
       }
 
       if (control_dates?.length !== 0) {
         headerRow2.push('Підсумкові', ...Array(Math.max(control_dates?.length - 1, 0)).fill(''));
+        headerRow2.push('Середнє за підсумкові');
       }
 
       headerRow2.push('Середнє за групу');
-      headerRow3.push(...groupDates.map((date) => ukraineDate(date)), '');
+      
+      headerRow3.push(...groupDates.map((date) => date ? ukraineDate(date) : ''), '');
     });
-
+    
+    
     headerRow1.push('Середнє по групам');
     headerRow2.push('');
     headerRow3.push('');
-
+    console.log(headerRow1, headerRow2, headerRow3);
     sheetData.push(headerRow1, headerRow2, headerRow3);
 
     // Добавляем данные
     report.forEach((rowData) => {
       const row = [rowData.name];
+    
       groups.forEach(({ name, control_dates, assigment_dates }) => {
-        [...(assigment_dates || []), ...(control_dates || [])].forEach((date) => {
-          console.log('date', date);
-          
-          const value = rowData.groups
-            ?.find((group) => group.group === name)
-            ?.controls?.concat(rowData.groups?.find((group) => group.group === name)?.assigments || [])
-            ?.find((rating) => {
-              console.log('rating.date', rating.date);
-              
-              return rating.date === ukraineDate(date)
-            })
-            ?.rating || '';
+        const groupData = rowData.groups?.find((group) => group.group === name);
+    
+        // Получаем текущие оценки для assigments
+        const assigmentRatings = assigment_dates?.map((date) => {
+          return groupData?.assigments?.find((rating) => rating.date === ukraineDate(date))?.rating || '';
+        }) || [];
+    
+        // Получаем итоговые оценки для controls
+        const controlRatings = control_dates?.map((date) => {
+          return groupData?.controls?.find((rating) => rating.date === ukraineDate(date))?.rating || '';
+        }) || [];
+    
+        // Получаем средние оценки для assigments и controls
+        const assigmentAvg = groupData?.assigments?.find((rating) => rating.type === "Середня" && !rating.date)?.rating || '';
+        const controlAvg = groupData?.controls?.find((rating) => rating.type === "Середня" && !rating.date)?.rating || '';
+    
+        // Добавляем текущие и итоговые оценки
+        [...assigmentRatings].forEach((value) => {
           row.push(value);
         });
 
-        const groupAvg = rowData.groups?.find((group) => group.group === name)?.groupAvg || '';
+        if (assigmentRatings?.length) {
+          row.push(assigmentAvg);
+        }
+        
+        [...controlRatings].forEach((value) => {
+          row.push(value);
+        });
+        
+        if (controlRatings?.length) {
+          row.push(controlAvg);
+        }
+        
+        // Добавляем среднее по группе
+        const groupAvg = groupData?.groupAvg || '';
         row.push(groupAvg);
+        console.log(row);
+        
       });
+    
+      // Добавляем среднее по всем группам
       row.push(rowData.avg_groups || '');
       sheetData.push(row);
     });
-
+    
     // Генерация Excel-файла
     const ws = XLSX.utils.aoa_to_sheet(sheetData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Звіт');
-    XLSX.writeFile(wb, 'report.xlsx');
+    XLSX.writeFile(wb, `${reportData?.subject} ${reportData?.schoolClass}.xlsx`);
   };
 
   useEffect(() => {
@@ -197,8 +245,16 @@ function Report() {
     if (reportData?.report) {
       setReport(reportData?.report);
       setGroups(reportData?.groups);
+    } else {
+      if (!isLoadingReport) {
+        toast.current.show({
+          severity: 'error',
+          summary: 'Звіт',
+          detail: reportData?.message || 'Помилка'
+        })
+      }
     }
-  }, [reportData]);
+  }, [reportData, isLoadingReport]);
 
   return (
     <div className="flex flex-column gap-4">
@@ -210,7 +266,7 @@ function Report() {
           rounded
         />
         <div className="text-xl font-bold">
-          {reportData?.subject}, {reportData?.schoolClass}
+          {reportTypes?.find(({value}) => value === reportData?.reportType)?.name || ''}, {reportData?.subject}, {reportData?.schoolClass}
         </div>
       </div>
       <DataTable
@@ -227,19 +283,31 @@ function Report() {
         value={report || []}
       >
         <Column bodyClassName="bg-blue-900 text-white" header="ПІБ" field="name" />
-        {groups?.flatMap(({ _id, name, control_dates, assigment_dates }) => [
-          ...assigment_dates?.map((date, index) => (
+        {groups?.flatMap(({ _id, name, control_dates, assigment_dates }, i) => [
+          ...assigment_dates?.flatMap((date, index) => (
             <Column
               key={`${name}-assigment-${index}`}
               body={(rowData) => renderGroupData(rowData, name, date, 'assigment')}
             />
           )),
-          ...control_dates?.map((date, index) => (
+          <Column
+            hidden={!assigment_dates?.length}
+            bodyClassName="bg-cyan-300 text-cyan-800 font-bold text-center text-lg"
+            key={`${name}-assigment-avg`}
+            body={(rowData) => renderGroupData(rowData, name, '', 'assigment')}
+          />,
+          ...control_dates?.flatMap((date, index) => (
             <Column
               key={`${name}-control-${index}`}
               body={(rowData) => renderGroupData(rowData, name, date, 'control')}
             />
           )),
+          <Column
+            hidden={!control_dates?.length}
+            bodyClassName="bg-yellow-300 text-yellow-800 font-bold text-center text-lg"
+            key={`${name}-control-avg`}
+            body={(rowData) => renderGroupData(rowData, name, '', 'control')}
+          />,
           <Column
             bodyClassName="bg-green-300 text-green-800 font-bold text-center text-lg"
             key={`${name}-avg`}

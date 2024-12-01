@@ -10,18 +10,14 @@ function Payment() {
   const { data: paymentsData, refetch: getCheckPayments } = useCheckPayments()
   const navigate = useNavigate();
 
-  function unAuthorized() {
-    localStorage.removeItem('access_token');
-    navigate('/login')
-  }
-
-  useEffect(() => {
+  useEffect(() => {  
     if (paymentsData?.user) {
       navigate('/')
     }
   }, [paymentsData]);
 
   useEffect(() => {
+    getCheckPayments()
     setGlobalTitle('Тарифи')
   }, [])
 

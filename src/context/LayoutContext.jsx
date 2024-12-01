@@ -6,6 +6,7 @@ import { checkToken } from '../shared/utils/utils.js';
 export const LayoutContext = createContext(); // Создаём контекст
 
 function LayoutProvider({ children }) {
+  const [login, setLogin] = useState(localStorage.getItem('login'))
   const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
   const [globalTitle, setGlobalTitle] = useState('');
   const [isLogin, setIsLogin] = useState(checkToken(localStorage.getItem('access_token')));
@@ -23,6 +24,8 @@ function LayoutProvider({ children }) {
         setIsLogin,
         setAccessToken,
         accessToken,
+        login,
+        setLogin
       }}
     >
       <ConfirmPopup />

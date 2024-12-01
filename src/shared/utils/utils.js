@@ -5,11 +5,11 @@ export function buildApiUrl(baseUrl, endpoint, parameters) {
   const separator = hasParams ? '&' : '?';
   const paramsString = parameters
     ? Object.entries(parameters)
-        .filter(([key, value]) =>
-          Array.isArray(value) ? value?.length !== 0 : value !== undefined && value !== null && value !== ''
-        )
-        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-        .join('&')
+      .filter(([key, value]) =>
+        Array.isArray(value) ? value?.length !== 0 : value !== undefined && value !== null && value !== ''
+      )
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&')
     : '';
 
   return `${baseUrl}${endpoint}${paramsString ? separator + paramsString : ''}`;
@@ -31,18 +31,11 @@ export function checkToken(token) {
   }
 }
 
-export function checkCodeStatus(status){
-  if(status === 401){
-    localStorage.clear()
-    window.location.reload()
-  }
-}
-
 export function ukraineDate(date) {
   return new Date(date).toLocaleDateString('uk-UA', {
-      timeZone: 'Europe/Kiev',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
+    timeZone: 'Europe/Kiev',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
   });
 }

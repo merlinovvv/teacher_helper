@@ -18,6 +18,7 @@ function Subjects() {
     isPending: saveSubjectsLoading,
   } = useSaveSubjects(payload);
   const { data: subjectsData, refetch: getSubjects, isFetching: subjectsLoading } = useGetSubjects();
+  
   const [deleteId, setDeleteId] = useState();
   const {
     data: deleteSubjectsData,

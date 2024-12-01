@@ -38,7 +38,10 @@ function Sidebar() {
       >
         <div className="flex flex-column h-full">
           <div className="flex align-items-center justify-content-between px-4 pt-3 flex-shrink-0">
-            <span className="text-2xl font-bold flex align-items-center gap-2"><div style={{width: '25px', height: '25px'}} className="bg-primary-500 border-circle"></div>Teacher Helper</span>
+            <span className="text-2xl font-bold flex align-items-center gap-2">
+              <img style={{maxWidth: 35}} src="/logo.svg" alt="" />
+              Grades Helper
+            </span>
           </div>
           <div className="overflow-y-auto">
             <Category title="Меню">

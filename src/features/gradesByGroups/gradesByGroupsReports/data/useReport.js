@@ -25,8 +25,9 @@ async function saveReport(payload) {
 }
 
 export function useGetReport(payload) {
+  
   return useQuery({
-    queryKey: ['report-get'],
+    queryKey: [`report-get-${payload}`],
     queryFn: () => getReport(payload),
   });
 }

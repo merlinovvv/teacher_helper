@@ -1,13 +1,13 @@
 import { createRoot } from 'react-dom/client';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { PrimeReactProvider } from 'primereact/api';
-import AppRoutes from './AppRoutes.jsx';
+import App from './App.jsx';
 import Localization from './Localization.jsx';
 import LayoutProvider from '../context/LayoutContext.jsx';
 import { QueryClient } from '@tanstack/react-query';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import '../assets/styles/index.css';
-import 'primereact/resources/themes/lara-light-teal/theme.css';
+import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/primereact.css';
@@ -29,7 +29,7 @@ createRoot(document.getElementById('root')).render(
     <PrimeReactProvider value={{ ripple: true }}>
       <LayoutProvider>
         <Localization />
-        <AppRoutes />
+        <App />
       </LayoutProvider>
     </PrimeReactProvider>
   </PersistQueryClientProvider>

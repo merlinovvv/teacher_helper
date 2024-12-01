@@ -7,6 +7,7 @@ import { useContext, useEffect, useState } from 'react';
 import { LayoutContext } from '../../../../../context/LayoutContext.jsx';
 import { confirmPopup } from 'primereact/confirmpopup';
 import { useNavigate } from 'react-router-dom';
+import { reportTypes } from '../../../../../shared/utils/constants.js';
 
 function ReportsList({ reports, isLoadingReports, getReports }) {
   const navigate = useNavigate();
@@ -60,8 +61,9 @@ function ReportsList({ reports, isLoadingReports, getReports }) {
             loading={isLoadingReports}
             value={reports || []}
           >
-            <Column className="w-6" header="Предмет" body={({ subject }) => subject.name} />
-            <Column className="w-6" header="Клас" body={({ schoolClass }) => schoolClass.name} />
+            <Column className="w-4" header="Предмет" body={({ subject }) => subject.name} />
+            <Column className="w-4" header="Клас" body={({ schoolClass }) => schoolClass.name} />
+            <Column className="w-4" header="Тип звіту" body={({ reportType }) => reportTypes?.find(({value}) => value === reportType)?.name || ''} />
             <Column
               header="Видалити"
               body={({ _id }) => (

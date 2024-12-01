@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { useLogin } from './data/useAuthorization.js';
 import { Form, Formik } from 'formik';
 import { LayoutContext } from '../../../../context/LayoutContext.jsx';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { checkToken } from '../../../../shared/utils/utils.js';
 import TextField from '../../../../shared/fields/TextField/TextField.jsx';
 import PasswordField from '../../../../shared/fields/PasswordField/PasswordField.jsx';
@@ -27,9 +27,10 @@ function Login({ setIsLoginType }) {
   useEffect(() => {
     if (loginSuccess && loginData) {
       if (loginData?.success) {
-        localStorage.setItem('access_token', loginData?.response?.token);
-        setAccessToken(loginData?.response?.token);
-        setIsLogin(checkToken(loginData?.response?.token));
+        localStorage.setItem('access_token', loginData?.response?.accessToken);
+        localStorage.setItem('refresh_token', loginData?.response?.refreshToken);
+        setAccessToken(loginData?.response?.accessToken);
+        setIsLogin(checkToken(loginData?.response?.accessToken));
         navigate('/');
       } else {
         toast.current.show({
