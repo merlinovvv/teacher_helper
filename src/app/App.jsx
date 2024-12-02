@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import AppRoutes from './AppRoutes'
 import { LayoutContext } from '../context/LayoutContext'
+import QuestionsButton from '../shared/components/QuestionsButton/QuestionsButton'
 
 function App() {
     const context = useContext(LayoutContext)
@@ -21,6 +22,7 @@ function App() {
     return (
         <section>
             <AppRoutes />
+            <QuestionsButton/>
         </section>
     )
 }

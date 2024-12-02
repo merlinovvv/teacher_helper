@@ -24,7 +24,7 @@ function Authorize() {
                     <Divider />
                     <div className="flex flex-column gap-3 align-items-center">
                         <div className='text-xl font-light text-color text-center'>
-                            Не знаєте як <span className="text-primary-500">користуватися</span> платформою? Скористайтесь нашим <Link to="123" className="text-primary-500 font-bold underline">відео-уроком</Link>
+                            Не знаєте як <span className="text-primary-500">користуватися</span> платформою? Перегляньте наш <Link to="https://youtu.be/JpaDcUKX07o" target='_blank' className="text-primary-500 font-bold underline">відео-урок <i className='pi pi-youtube'></i></Link>
                         </div>
                     </div>
                 </div>
