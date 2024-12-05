@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import Header from '../../shared/components/Header/Header.jsx';
 import { LayoutContext } from '../../context/LayoutContext.jsx'
+import AnalyticsTracker from '../../app/AnalyticsTracker.jsx';
 
 function Payment() {
   const { setGlobalTitle } = useContext(LayoutContext)
@@ -23,6 +24,7 @@ function Payment() {
 
   return (
     <div className="">
+      <AnalyticsTracker />
       <Header withoutSidebar={true} />
       <div className="flex flex-column justify-content-center align-items-center w-full">
         <div className="text-900 font-bold text-6xl mb-4 text-center">Тарифи</div>

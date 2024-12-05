@@ -5,12 +5,14 @@ import { Divider } from 'primereact/divider';
 import Login from './components/login/Login';
 import Registration from './components/registration/Registration.jsx';
 import { LayoutContext } from '../../context/LayoutContext.jsx';
+import AnalyticsTracker from '../../app/AnalyticsTracker.jsx';
 
 function Authorize() {
     const { login } = useContext(LayoutContext)
     const [isLoginType, setIsLoginType] = useState(login ? true : false)
     return (
-        <div className="flex lg:flex-row flex-column justify-content-center min-h-screen">
+        <div className="flex lg:flex-row flex-column justify-content-center min-h-screen align-items-center">
+            <AnalyticsTracker />
             {isLoginType ? <Login setIsLoginType={setIsLoginType} /> : <Registration setIsLoginType={setIsLoginType} />}
             <div className='lg:w-8 lg:flex hidden relative'>
                 <div className='m-4 p-6 flex flex-column gap-6 surface-card border-round-3xl justify-content-center align-items-center border-1 border-gray-300 shadow-4'>
