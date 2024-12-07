@@ -1,11 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Category from './components/Category/Category';
-import Item from './components/Item/Item';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { LayoutContext } from '../../../context/LayoutContext.jsx';
+import { Sidebar } from 'primereact/sidebar';
+import SidebarContent from './components/SidebarContent/SidebarContent.jsx';
 
-function Sidebar() {
-  const { sidebarIsOpen } = useContext(LayoutContext);
+function SidebarCustom() {
+  const { sidebarIsOpen, setSidebarIsOpen } = useContext(LayoutContext);
   const [sidebarStyles, setSidebarStyles] = useState();
+  const [windowWidth, setWindowWidth] = useState()
 
   useEffect(() => {
     if (sidebarIsOpen) {
@@ -27,31 +28,39 @@ function Sidebar() {
     }
   }, [sidebarIsOpen]);
 
+  useEffect(() => {
+    const updateReportWidth = () => {
+      const calculatedWidth = window.innerWidth;
+      setWindowWidth(calculatedWidth);
+    };
+
+    updateReportWidth(); // Первичное обновление при монтировании компонента
+
+    const handleResize = () => {
+      updateReportWidth(); // Обновление при изменении размера окна
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [sidebarIsOpen]);
+
   return (
-    <div
-      style={sidebarStyles}
-      className="min-h-screen flex relative lg:static surface-50 border-round border-1 surface-border"
-    >
-      <div
-        id="app-sidebar-2"
-        className="h-screen block flex-shrink-0 absolute lg:static left-0 top-0 z-1 select-none w-full"
-      >
-        <div className="flex flex-column h-full">
-          <div className="flex align-items-center justify-content-between px-4 pt-3 flex-shrink-0">
-            <span className="text-2xl font-bold flex align-items-center gap-2">
-              <img style={{maxWidth: 35}} src="/logo.svg" alt="" />
-              Grades Helper
-            </span>
-          </div>
-          <div className="overflow-y-auto">
-            <Category title="Меню">
-              <Item to="grades-by-groups" title="Оцінки за групами" />
-            </Category>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Fragment>
+      {windowWidth < 992 ? (
+        <Sidebar
+          visible={sidebarIsOpen}
+          onHide={() => setSidebarIsOpen(false)}
+          content={({ closeIconRef, hide }) => (
+            <SidebarContent closeIconRef={closeIconRef} hide={hide} />
+          )} />
+      ) : (
+        <SidebarContent />
+      )}
+    </Fragment>
   );
 }
 
-export default Sidebar;
+export default SidebarCustom;

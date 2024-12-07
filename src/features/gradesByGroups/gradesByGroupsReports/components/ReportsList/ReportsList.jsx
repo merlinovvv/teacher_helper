@@ -51,35 +51,31 @@ function ReportsList({ reports, isLoadingReports, getReports }) {
   }, [deleteReportSuccess, deleteReportData]);
 
   return (
-    <div>
-      <Accordion activeIndex={0}>
-        <AccordionTab header="Звіти">
-          <DataTable
-            selectionMode="single"
-            onRowSelect={handleOpenReport}
-            stripedRows
-            loading={isLoadingReports}
-            value={reports || []}
-          >
-            <Column className="w-4" header="Предмет" body={({ subject }) => subject.name} />
-            <Column className="w-4" header="Клас" body={({ schoolClass }) => schoolClass.name} />
-            <Column className="w-4" header="Тип звіту" body={({ reportType }) => reportTypes?.find(({value}) => value === reportType)?.name || ''} />
-            <Column
-              header="Видалити"
-              body={({ _id }) => (
-                <Button
-                  icon="pi pi-times"
-                  text
-                  severity="danger"
-                  disabled={isLoadingDeleteReport}
-                  loading={isLoadingDeleteReport && deleteId === _id}
-                  onClick={(e) => handleDeleteReport(e, _id)}
-                />
-              )}
+    <div className='flex flex-column gap-4'>
+      <DataTable
+        selectionMode="single"
+        onRowSelect={handleOpenReport}
+        stripedRows
+        loading={isLoadingReports}
+        value={reports || []}
+      >
+        <Column className="w-12" header="Звіт" body={({ subject, schoolClass, reportType }) => {
+          return [subject.name, schoolClass.name, reportTypes?.find(({ value }) => value === reportType)?.name || '']?.join(', ')
+        }} />
+        <Column
+          header="Видалити"
+          body={({ _id }) => (
+            <Button
+              icon="pi pi-times"
+              text
+              severity="danger"
+              disabled={isLoadingDeleteReport}
+              loading={isLoadingDeleteReport && deleteId === _id}
+              onClick={(e) => handleDeleteReport(e, _id)}
             />
-          </DataTable>
-        </AccordionTab>
-      </Accordion>
+          )}
+        />
+      </DataTable>
     </div>
   );
 }

@@ -1,25 +1,23 @@
 import { useContext, useEffect, useState } from 'react';
 import { Form, Formik } from 'formik';
 import { Accordion, AccordionTab } from 'primereact/accordion';
-import { useGetSubjects } from '../../../data/useSubjects.js';
 import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
-import { Calendar } from 'primereact/calendar';
 import { Divider } from 'primereact/divider';
-import {
-  useGetGradesByGroupsSettings,
-  useSaveGradesByGroupsSettings,
-} from '../../../data/useGradesByGroupsSettings.js';
+import { useGetGradesByGroupsSettings, useSaveGradesByGroupsSettings } from '../../../data/useGradesByGroupsSettings.js';
 import { LayoutContext } from '../../../../../context/LayoutContext.jsx';
 import { Panel } from 'primereact/panel';
 import Loading from '../../../../../shared/components/Loading/Loading.jsx';
+import { Message } from 'primereact/message';
+import * as Yup from 'yup';
+import TextField from '../../../../../shared/fields/TextField/TextField.jsx';
+import CalendarField from '../../../../../shared/fields/CalendarField/CalendarField.jsx';
+import AccordionHeaderTemplate from './components/AccordionHeaderTemplate.jsx';
+import { useGetSubjects } from '../../../data/useSubjects.js';
 import { useGetClasses } from '../../../data/useClasses.js';
 
 function Groups() {
+
   const { toast } = useContext(LayoutContext);
-  const { data: subjectsData, isPending: subjectsLoading } = useGetSubjects();
-  const { data: classesData, isPending: classesLoading } = useGetClasses();
   const [groups, setGroups] = useState([]);
   const {
     data: saveGradesByGroupsData,
@@ -32,8 +30,18 @@ function Groups() {
     refetch: getGradesByGroups,
     isFetching: gradesByGroupsLoading,
   } = useGetGradesByGroupsSettings();
-  const [subjects, setSubjects] = useState();
-  const [classes, setClasses] = useState();
+  const { data: subjectsData, isPending: subjectsLoading } = useGetSubjects();
+  const { data: classesData, isPending: classesLoading } = useGetClasses();
+
+  const validationSchema = Yup.array().of(Yup.object().shape({
+    schoolClass: Yup.string().required("Оберіть клас!"),
+    subject: Yup.string().required("Оберіть предмет!"),
+    groups: Yup.array().of(Yup.object().shape({
+      name: Yup.string().required('Введіть назву групи'),
+      control_dates: Yup.array(),
+      assigment_dates: Yup.array()
+    }))
+  }))
 
   function handleAddGroup(nameSubject, indexSubject, setFieldValue, values, e) {
     e.preventDefault();
@@ -54,34 +62,6 @@ function Groups() {
     ]);
   }
 
-  function accordionHeaderTemplate(subject, index, handleChange, values) {
-    return (
-      <div className="flex align-items-center justify-content-between w-full">
-        <span className="flex align-items-center gap-2 w-full">
-          <Dropdown
-            value={values[index].subject}
-            options={subjects || []}
-            optionValue="_id"
-            optionLabel="name"
-            name={`${index}.subject`}
-            onChange={handleChange}
-            placeholder="Оберіть предмет"
-          />
-          <Dropdown
-            value={values[index].schoolClass}
-            options={classes || []}
-            optionValue="_id"
-            optionLabel="name"
-            name={`${index}.schoolClass`}
-            onChange={handleChange}
-            placeholder="Оберіть клас"
-          />
-        </span>
-        <Button icon="pi pi-times" text onClick={(e) => handleDeleteSubjectClass(e, index)} severity="danger" />
-      </div>
-    );
-  }
-
   function handleAddSubjectClass(e) {
     e.preventDefault();
     setGroups([
@@ -98,11 +78,6 @@ function Groups() {
         ],
       },
     ]);
-  }
-
-  function handleDeleteSubjectClass(e, index) {
-    e.preventDefault();
-    setGroups([...groups?.filter((_, indexGroup) => indexGroup !== index)]);
   }
 
   async function handleSubmit(values) {
@@ -127,105 +102,64 @@ function Groups() {
     }
   }, [gradesByGroupsData]);
 
-  useEffect(() => {
-    if (subjectsData) {
-      setSubjects(subjectsData?.subjects);
-    }
-  }, [subjectsData]);
-
-  useEffect(() => {
-    if (classesData) {
-      setClasses(classesData?.classes);
-    }
-  }, [classesData]);
-
-  return subjectsLoading || classesLoading ? (
+  return false ? (
     <Loading />
   ) : (
-    <Formik enableReinitialize initialValues={groups} onSubmit={(values) => handleSubmit(values)}>
-      {({ values, handleChange, setFieldValue }) => {
+    <Formik validationSchema={validationSchema} enableReinitialize initialValues={groups} onSubmit={(values) => handleSubmit(values)}>
+      {({ values, handleChange, setFieldValue, dirty, errors, touched }) => {
         return (
-          <Form className="flex gap-2">
-            <div className="flex flex-column gap-2 w-10">
+          <Form className="flex gap-2 lg:flex-row flex-column">
+            <div className="flex flex-column gap-2 lg:w-10 w-full">
               <Accordion>
                 {values?.map(({ subject, groups }, indexSubject) => {
                   return (
                     <AccordionTab
                       key={`${indexSubject}`}
-                      headerTemplate={(e) => accordionHeaderTemplate(subject, indexSubject, handleChange, values)}
+                      headerTemplate={<AccordionHeaderTemplate subjectsData={subjectsData} classesData={classesData} index={indexSubject} setGroups={setGroups} />}
                     >
                       {groups?.map((item, indexGroup) => {
                         return (
                           <div key={`${subject}-${indexGroup}-${indexSubject}`}>
-                            <div className="flex gap-6 align-items-center">
-                              <span className="font-bold text-xl">{indexGroup + 1}</span>
-                              <div className="grid formgrid w-full">
-                                <div className="field col-12 flex flex-column">
-                                  <label
-                                    htmlFor={`${indexSubject}.groups.${indexGroup}.name`}
-                                    className="font-bold text-sm"
-                                  >
-                                    Назва групи
-                                  </label>
-                                  <InputText
-                                    value={values[indexSubject].groups[indexGroup].name}
-                                    name={`${indexSubject}.groups.${indexGroup}.name`}
-                                    onChange={handleChange}
-                                  />
-                                </div>
-                                <div className="field col-12 flex flex-column">
-                                  <label
-                                    htmlFor={`${indexSubject}.groups.${indexGroup}.assigment_dates`}
-                                    className="font-bold text-sm"
-                                  >
-                                    Дати завдань
-                                  </label>
-                                  <Calendar
-                                    locale="uk"
-                                    showIcon
-                                    selectionMode="multiple"
-                                    readOnlyInput
-                                    numberOfMonths={2}
-                                    name={`${indexSubject}.groups.${indexGroup}.assigment_dates`}
-                                    value={values[indexSubject].groups[indexGroup].assigment_dates?.map(
-                                      (date) => new Date(date)
-                                    )}
-                                    onChange={handleChange}
-                                    touchUI
-                                    dateFormat="dd.mm.yy"
-                                  />
-                                </div>
-                                <div className="field col-12 flex flex-column">
-                                  <label
-                                    htmlFor={`${indexSubject}.groups.${indexGroup}.control_dates`}
-                                    className="font-bold text-sm"
-                                  >
-                                    Дати контролів
-                                  </label>
-                                  <Calendar
-                                    locale="uk"
-                                    showIcon
-                                    selectionMode="multiple"
-                                    readOnlyInput
-                                    numberOfMonths={2}
-                                    name={`${indexSubject}.groups.${indexGroup}.control_dates`}
-                                    value={values[indexSubject].groups[indexGroup].control_dates?.map(
-                                      (date) => new Date(date)
-                                    )}
-                                    onChange={handleChange}
-                                    touchUI
-                                    dateFormat="dd.mm.yy"
-                                  />
-                                </div>
+                            <div className="flex gap-4 flex-column">
+                              <div className='flex justify-content-between align-items-center'>
+                                <span className="font-bold text-xl">{indexGroup + 1} група</span>
+                                <Button
+                                  text
+                                  severity="danger"
+                                  onClick={(e) =>
+                                    handleDeleteGroup(subject, indexSubject, setFieldValue, values, indexGroup, e)
+                                  }
+                                  icon="pi pi-trash"
+                                />
                               </div>
-                              <Button
-                                text
-                                severity="danger"
-                                onClick={(e) =>
-                                  handleDeleteGroup(subject, indexSubject, setFieldValue, values, indexGroup, e)
-                                }
-                                icon="pi pi-times"
-                              />
+                              <div className="grid formgrid w-full">
+                                <TextField
+                                  label="Назва групи"
+                                  name={`${indexSubject}.groups.${indexGroup}.name`}
+                                  value={values[indexSubject].groups[indexGroup].name}
+                                  onChange={handleChange}
+                                />
+                                <CalendarField
+                                  selectionMode="multiple"
+                                  numberOfMonths={2}
+                                  name={`${indexSubject}.groups.${indexGroup}.assigment_dates`}
+                                  value={values[indexSubject].groups[indexGroup].assigment_dates?.map(
+                                    (date) => new Date(date)
+                                  )}
+                                  onChange={handleChange}
+                                  label="Дати завдань"
+                                />
+                                <CalendarField
+                                  selectionMode="multiple"
+                                  numberOfMonths={2}
+                                  name={`${indexSubject}.groups.${indexGroup}.control_dates`}
+                                  value={values[indexSubject].groups[indexGroup].control_dates?.map(
+                                    (date) => new Date(date)
+                                  )}
+                                  onChange={handleChange}
+                                  label="Дати контролів"
+                                />
+                              </div>
                             </div>
                             <Divider className="mt-4 mb-6" />
                           </div>
@@ -251,14 +185,24 @@ function Groups() {
                 onClick={(e) => handleAddSubjectClass(e)}
               />
             </div>
-            <Panel header="Збереження" className="w-2">
-              <Button
-                loading={saveGradesByGroupsLoading || gradesByGroupsLoading}
-                className="w-full"
-                label="Зберегти"
-                icon="pi pi-save"
-                type="submit"
-              />
+            <Panel header="Збереження" className="lg:w-2 w-full">
+              <div className='flex flex-column gap-2'>
+                {dirty && (
+                  <Message severity="warn" text="Є не збережені зміни" />
+                )}
+                {(Object.keys(errors)?.length !== 0 && Object.keys(touched)?.length !== 0) && (
+                  <Message severity="error" text="Перевірте правильність введених даних" />
+                )}
+                <Button
+                  disabled={(Object.keys(errors)?.length !== 0 && Object.keys(touched)?.length !== 0)}
+                  loading={saveGradesByGroupsLoading || gradesByGroupsLoading}
+                  className="w-full"
+                  label="Зберегти"
+                  icon="pi pi-save"
+                  type="submit"
+                />
+              </div>
+
             </Panel>
           </Form>
         );

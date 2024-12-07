@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import Header from '../../shared/components/Header/Header.jsx';
 import { LayoutContext } from '../../context/LayoutContext.jsx'
-import AnalyticsTracker from '../../app/AnalyticsTracker.jsx';
 
 function Payment() {
   const { setGlobalTitle } = useContext(LayoutContext)
@@ -24,14 +23,13 @@ function Payment() {
 
   return (
     <div className="">
-      <AnalyticsTracker />
       <Header withoutSidebar={true} />
       <div className="flex flex-column justify-content-center align-items-center w-full">
-        <div className="text-900 font-bold text-6xl mb-4 text-center">Тарифи</div>
+        <div className="text-900 font-bold text-6xl mt-4 mb-4 text-center">Тарифи</div>
         <div className="text-700 text-xl mb-6 text-center line-height-3">Достатньо оплатити один раз, щоб користуватися зручною платформою</div>
 
         <div className="grid justify-content-center align-items-center w-full">
-          <div className="col-4">
+          <div style={{maxWidth: 500}} className="w-full">
             <div className="p-3 h-full">
               <div className="surface-card shadow-2 p-3 h-full flex flex-column" style={{ borderRadius: '6px' }}>
                 <div className="text-900 font-medium text-xl mb-2">Стандарт</div>
@@ -58,7 +56,7 @@ function Payment() {
                 </ul>
                 <hr className="mb-3 mx-0 border-top-1 border-bottom-none border-300 mt-auto" />
                 <div className="flex flex-column gap-2 align-items-center w-full">
-                  <Button onClick={() => window.open('https://donatello.to/TeacherHelper', '_blank')} icon="pi pi-external-link" label="Придбати за допомогою Donatello" className="w-full mt-auto" />
+                  <Button onClick={() => window.open('https://donatello.to/GradesHelper', '_blank')} icon="pi pi-external-link" label="Придбати за допомогою Donatello" className="w-full mt-auto" />
                 </div>
               </div>
             </div>

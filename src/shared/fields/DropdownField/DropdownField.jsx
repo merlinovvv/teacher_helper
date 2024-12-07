@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import Label from '../Label/Label.jsx';
 import { Dropdown } from 'primereact/dropdown';
 
-function DropdownField({ className, name, placeholder, label, fieldClassName, labelClassName, value, onChange, options, optionLabel, optionValue }) {
+function DropdownField({ className, name, placeholder, label, fieldClassName, labelClassName, value, onChange, options, optionLabel, optionValue, loading }) {
     return (
         <div className={classNames('field flex flex-column', className || 'col-12')}>
             <Label labelClassName={labelClassName} name={name} title={label} />
@@ -18,6 +18,7 @@ function DropdownField({ className, name, placeholder, label, fieldClassName, la
                 filter
                 optionLabel={optionLabel || 'name'}
                 optionValue={optionValue || 'value'}
+                loading={loading}
             />
         </div>
     );

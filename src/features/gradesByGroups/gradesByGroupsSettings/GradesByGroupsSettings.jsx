@@ -7,7 +7,7 @@ import ReportType from './tabs/ReportType/ReportType.jsx';
 
 function GradesByGroupsSettings() {
   return (
-    <TabView>
+    <TabView scrollable>
       <TabPanel header="Тип звіту">
         <ReportType />
       </TabPanel>

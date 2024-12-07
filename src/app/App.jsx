@@ -13,7 +13,7 @@ function App() {
     }, [context?.globalTitle])
 
     useEffect(() => {
-        if ((!localStorage.getItem('access_token') || !localStorage.getItem('refresh_token')) && window.location.pathname !== '/authorize') {
+        if ((!localStorage.getItem('access_token') || !localStorage.getItem('refresh_token')) && window.location.pathname !== '/authorize' && window.location.pathname !== '/payment') {
             window.location.href = '/authorize'
             // window.location.reload()
         }

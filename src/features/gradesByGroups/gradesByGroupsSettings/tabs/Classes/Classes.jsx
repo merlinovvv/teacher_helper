@@ -62,13 +62,19 @@ function Classes() {
     );
   };
 
-  const confirmDelete = (e, id, name) => {
+  const confirmDelete = (e, id, name, rowIndex) => {
     confirmPopup({
       target: e.currentTarget,
       message: `Ви впевнені, що хочете видалити "${name}"?`,
       icon: 'pi pi-exclamation-triangle',
       defaultFocus: 'accept',
-      accept: () => handleDeleteClass(id),
+      accept: () => {
+        if (id) {
+          handleDeleteClass(id)
+        } else {
+          setClasses(classes?.filter((_, i) => i !== rowIndex))
+        }
+      },
       acceptLabel: 'Так',
       rejectLabel: 'Ні',
     });
@@ -116,12 +122,12 @@ function Classes() {
       <Column header="Ред." rowEditor />
       <Column
         header="Видалити"
-        body={({ name, _id }) => (
+        body={({ name, _id }, { rowIndex }) => (
           <Button
             disabled={deleteClassesLoading}
             loading={deleteClassesLoading && deleteId === _id}
             icon="pi pi-times"
-            onClick={(e) => confirmDelete(e, _id, name)}
+            onClick={(e) => confirmDelete(e, _id, name, rowIndex)}
             severity="danger"
             text
           />

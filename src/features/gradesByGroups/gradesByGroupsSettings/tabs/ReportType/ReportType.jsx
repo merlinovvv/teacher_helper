@@ -36,7 +36,7 @@ export default function ReportType() {
 
     return (
         <Formik enableReinitialize initialValues={userData?.user || {}} onSubmit={async (values) => handleSubmit(values)}>
-            {({ values, handleChange }) => (
+            {({ values, handleChange, submitForm }) => (
                 <Form className="flex gap-2 w-full">
                     <div className='formgrid w-full'>
                         <DropdownField
@@ -44,18 +44,21 @@ export default function ReportType() {
                             placeholder="Виберіть тип звітів"
                             options={reportTypes}
                             name="type_report"
-                            onChange={handleChange}
+                            onChange={async (e) => {
+                                await handleChange(e)
+                                submitForm()
+                            }}
                             value={values.type_report}
                         />
                     </div>
-                    <Panel className='w-20rem' header="Збереження">
+                    {/* <Panel className='w-20rem' header="Збереження">
                         <Button
                             label="Зберегти"
                             icon="pi pi-save"
                             type="submit"
                             loading={userDataLoading || userUpdateLoading}
                         />
-                    </Panel>
+                    </Panel> */}
                 </Form>
             )}
         </Formik>

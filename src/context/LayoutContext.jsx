@@ -7,7 +7,7 @@ export const LayoutContext = createContext(); // Создаём контекст
 
 function LayoutProvider({ children }) {
   const [login, setLogin] = useState(localStorage.getItem('login'))
-  const [sidebarIsOpen, setSidebarIsOpen] = useState(true);
+  const [sidebarIsOpen, setSidebarIsOpen] = useState(window.innerWidth >= 992);
   const [globalTitle, setGlobalTitle] = useState('');
   const [isLogin, setIsLogin] = useState(checkToken(localStorage.getItem('access_token')));
   const [accessToken, setAccessToken] = useState(localStorage.getItem('access_token'));

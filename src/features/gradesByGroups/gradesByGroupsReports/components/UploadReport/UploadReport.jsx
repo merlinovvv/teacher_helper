@@ -77,74 +77,78 @@ function UploadReport({ getReports }) {
   }, [saveReportSuccess, saveReportData]);
 
   return (
-    <Formik initialValues={initialValues} onSubmit={async (values) => handleSubmit(values)}>
-      {({ values, handleChange }) => {
-        return (
-          <Form className="grid formgrid">
-            <div className="field col-3 flex flex-column">
-              <label htmlFor="" className="text-sm font-bold">
-                Оберіть предмет
-              </label>
-              <Dropdown
-                options={subjects}
-                optionValue="_id"
-                optionLabel="name"
-                name="subject"
-                onChange={handleChange}
-                value={values?.subject}
-                showClear
-                loading={subjectsLoading}
-                placeholder="Оберіть предмет"
-              />
-            </div>
-            <div className="field col-3 flex flex-column">
-              <label htmlFor="schoolClass" className="text-sm font-bold">
-                Оберіть клас
-              </label>
-              <Dropdown
-                options={classes}
-                optionValue="_id"
-                optionLabel="name"
-                name="schoolClass"
-                onChange={handleChange}
-                value={values?.schoolClass}
-                showClear
-                loading={classesLoading}
-                placeholder="Оберіть клас"
-              />
-            </div>
-            <div className="field col-3 flex flex-column">
-              <label htmlFor="" className="font-bold text-sm">
-                Оберіть звіт
-              </label>
-              <Button
-                disabled={!(values?.subject && values?.schoolClass)}
-                label={selectFileLabel}
-                icon="pi pi-file"
-                onClick={(e) => {
-                  e.preventDefault();
-                  fileRef.current.click();
-                }}
-                outlined
-              />
-              <input className="hidden" ref={fileRef} type="file" onChange={(e) => handleChangeFile(e)} />
-            </div>
-            <div className="field col-3 flex flex-column">
-              <label htmlFor="" className="font-bold text-sm">
-                Завантажити звіт
-              </label>
-              <Button
-                loading={saveReportLoading}
-                disabled={!(values?.subject && values?.schoolClass && file)}
-                icon="pi pi-upload"
-                type="submit"
-                className="w-full"
-              />
-            </div>
-          </Form>
-        );
-      }}
-    </Formik>
+    <div className='flex flex-column gap-4'>
+      <h2 className='text-xl font-bold'>Завантаження звіту</h2>
+      <Formik initialValues={initialValues} onSubmit={async (values) => handleSubmit(values)}>
+        {({ values, handleChange }) => {
+          return (
+            <Form className="grid formgrid">
+              <div className="field lg:col-3 md:col-6 col-12 flex flex-column">
+                <label htmlFor="" className="text-sm font-bold">
+                  Оберіть предмет
+                </label>
+                <Dropdown
+                  options={subjects}
+                  optionValue="_id"
+                  optionLabel="name"
+                  name="subject"
+                  onChange={handleChange}
+                  value={values?.subject}
+                  showClear
+                  loading={subjectsLoading}
+                  placeholder="Оберіть предмет"
+                />
+              </div>
+              <div className="field lg:col-3 md:col-6 col-12 flex flex-column">
+                <label htmlFor="schoolClass" className="text-sm font-bold">
+                  Оберіть клас
+                </label>
+                <Dropdown
+                  options={classes}
+                  optionValue="_id"
+                  optionLabel="name"
+                  name="schoolClass"
+                  onChange={handleChange}
+                  value={values?.schoolClass}
+                  showClear
+                  loading={classesLoading}
+                  placeholder="Оберіть клас"
+                />
+              </div>
+              <div className="field lg:col-3 md:col-6 col-12 flex flex-column">
+                <label htmlFor="" className="font-bold text-sm">
+                  Оберіть звіт
+                </label>
+                <Button
+                  disabled={!(values?.subject && values?.schoolClass)}
+                  label={selectFileLabel}
+                  icon="pi pi-file"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fileRef.current.click();
+                  }}
+                  outlined
+                />
+                <input className="hidden" ref={fileRef} type="file" onChange={(e) => handleChangeFile(e)} />
+              </div>
+              <div className="field lg:col-3 md:col-6 col-12 flex flex-column">
+                <label htmlFor="" className="font-bold text-sm">
+                  Завантажити звіт
+                </label>
+                <Button
+                  loading={saveReportLoading}
+                  disabled={!(values?.subject && values?.schoolClass && file)}
+                  icon="pi pi-upload"
+                  type="submit"
+                  className="w-full"
+                />
+              </div>
+            </Form>
+          );
+        }}
+      </Formik>
+    </div>
+
   );
 }
 

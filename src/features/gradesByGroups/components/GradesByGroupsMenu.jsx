@@ -2,6 +2,7 @@ import React from 'react';
 import { Menubar } from 'primereact/menubar';
 import { NavLink } from 'react-router-dom';
 import classNames from 'classnames';
+import { MegaMenu } from 'primereact/megamenu';
 
 function GradesByGroupsMenu() {
   const items = [
@@ -13,7 +14,7 @@ function GradesByGroupsMenu() {
             classNames('flex align-items-center p-menuitem-link', isActive ? 'text-primary-500' : '')
           }
         >
-          <span>Розрахунок</span>
+          <span>Звіти</span>
         </NavLink>
       ),
     },
@@ -31,7 +32,7 @@ function GradesByGroupsMenu() {
     },
   ];
 
-  return <Menubar model={items} />;
+  return <MegaMenu model={items}  breakpoint="360px" />
 }
 
 export default GradesByGroupsMenu;

@@ -4,12 +4,13 @@ import UploadReport from './components/UploadReport/UploadReport.jsx';
 import ReportsList from './components/ReportsList/ReportsList.jsx';
 import { useGetReports } from './data/useReports.js';
 import { Outlet, useParams } from 'react-router-dom';
+import { Divider } from 'primereact/divider';
 
 function GradesByGroupsReports() {
   const { report_id } = useParams();
   const { data: reports, refetch: getReports, isFetching: isLoadingReports } = useGetReports();
   return (
-    <Panel header="Розрахунок оцінок">
+    <Panel header="Звіти">
       {report_id ? (
         <Outlet />
       ) : (

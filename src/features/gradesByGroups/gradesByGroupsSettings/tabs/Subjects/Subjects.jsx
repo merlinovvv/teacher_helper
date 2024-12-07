@@ -63,13 +63,19 @@ function Subjects() {
     );
   };
 
-  const confirmDelete = (e, id, name) => {
+  const confirmDelete = (e, id, name, row) => {
     confirmPopup({
       target: e.currentTarget,
       message: `Ви впевнені, що хочете видалити предмет "${name}"?`,
       icon: 'pi pi-exclamation-triangle',
       defaultFocus: 'accept',
-      accept: () => handleDeleteSubject(id),
+      accept: () => {
+        if (id) {
+          handleDeleteSubject(id)
+        } else {
+          setSubjects(subjects.filter((_, i) => row?.rowIndex !== i))
+        }
+      } ,
       acceptLabel: 'Так',
       rejectLabel: 'Ні',
     });
@@ -117,12 +123,12 @@ function Subjects() {
       <Column header="Ред." rowEditor />
       <Column
         header="Видалити"
-        body={({ _id, name }) => (
+        body={({ _id, name }, row) => (
           <Button
             disabled={deleteSubjectsLoading}
             loading={deleteSubjectsLoading && deleteId === _id}
             icon="pi pi-times"
-            onClick={(e) => confirmDelete(e, _id, name)}
+            onClick={(e) => confirmDelete(e, _id, name, row)}
             severity="danger"
             text
           />
