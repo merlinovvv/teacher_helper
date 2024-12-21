@@ -36,7 +36,7 @@ function Payment() {
                 <div className="text-600">Для одного вчителя</div>
                 <hr className="my-3 mx-0 border-top-1 border-bottom-none border-300" />
                 <div className="flex align-items-center">
-                  <span className="font-bold text-2xl text-900">₴400</span>
+                  <span className="font-bold text-2xl text-900 text-red-500 flex align-items-start gap-2">₴99 <span className='line-through text-color text-lg'>₴400</span></span>
                   <span className="ml-2 font-medium text-600">одноразово</span>
                 </div>
                 <hr className="my-3 mx-0 border-top-1 border-bottom-none border-300" />

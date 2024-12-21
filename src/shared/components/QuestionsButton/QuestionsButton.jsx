@@ -10,7 +10,7 @@ export default function QuestionsButton() {
                 <div className='text-lg max-w-30rem'>
                     <p>
                         Якщо ви не знаєте як користуватися платформою, ви можете переглянути наш відео-урок за
-                        <a className="text-primary-500 font-bold underline" target='_black' href="https://youtu.be/JpaDcUKX07o"> посиланням <i className='pi pi-youtube'></i></a>.
+                        <a className="text-primary-500 font-bold underline" target='_black' href="https://youtu.be/3YYHrIS62nQ?si=GIidOdi3VNYScg0C"> посиланням <i className='pi pi-youtube'></i></a>.
                     </p>
                     <p>
                         Якщо у вас виникли проблеми з платформою, ви можете звернутися до адміністратора:
