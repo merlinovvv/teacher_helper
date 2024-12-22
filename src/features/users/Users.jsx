@@ -21,7 +21,8 @@ export default function Users() {
             <DataTable value={users?.users || []} loading={isLoadingUsers} showGridlines stripedRows>
                 <Column field='username' header="Ім'я користувача" />
                 <Column field='email' header="Email" />
-                <Column body={({ user_role }) => <Tag severity={severities[user_role]} value={roles[user_role]}/> } header="Роль" />
+                <Column body={({ reports }) => reports.length} header="Кількість звітів" />
+                <Column body={({ user_role }) => <Tag severity={severities[user_role]} value={roles[user_role]} />} header="Роль" />
             </DataTable>
         </Panel>
     )
