@@ -15,6 +15,8 @@ import { Divider } from 'primereact/divider';
 import { ukraineDate } from '../../../../../shared/utils/utils.js'
 import * as XLSX from 'xlsx';
 import { reportTypes } from '../../../../../shared/utils/constants.js';
+import { Chart } from 'primereact/chart';
+import { Badge } from 'primereact/badge';
 
 function Report() {
   const { report_id } = useParams();
@@ -26,6 +28,9 @@ function Report() {
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const { sidebarIsOpen, toast } = useContext(LayoutContext);
   const { data: reportData, isFetching: isLoadingReport } = useGetReport(report_id);
+  const [groupsStats, setGroupsStats] = useState()
+  const [totalStats, setTotalStats] = useState()
+  const documentStyle = getComputedStyle(document.documentElement);
 
   const headerGroup = (
     <ColumnGroup>
@@ -154,11 +159,11 @@ function Report() {
       }
 
       headerRow2.push('Середнє за групу');
-      
+
       headerRow3.push(...groupDates.map((date) => date ? ukraineDate(date) : ''), '');
     });
-    
-    
+
+
     headerRow1.push('Середнє по групам');
     headerRow2.push('');
     headerRow3.push('');
@@ -168,24 +173,24 @@ function Report() {
     // Добавляем данные
     report.forEach((rowData) => {
       const row = [rowData.name];
-    
+
       groups.forEach(({ name, control_dates, assigment_dates }) => {
         const groupData = rowData.groups?.find((group) => group.group === name);
-    
+
         // Получаем текущие оценки для assigments
         const assigmentRatings = assigment_dates?.map((date) => {
           return groupData?.assigments?.find((rating) => rating.date === ukraineDate(date))?.rating || '';
         }) || [];
-    
+
         // Получаем итоговые оценки для controls
         const controlRatings = control_dates?.map((date) => {
           return groupData?.controls?.find((rating) => rating.date === ukraineDate(date))?.rating || '';
         }) || [];
-    
+
         // Получаем средние оценки для assigments и controls
         const assigmentAvg = groupData?.assigments?.find((rating) => rating.type === "Середня" && !rating.date)?.rating || '';
         const controlAvg = groupData?.controls?.find((rating) => rating.type === "Середня" && !rating.date)?.rating || '';
-    
+
         // Добавляем текущие и итоговые оценки
         [...assigmentRatings].forEach((value) => {
           row.push(value);
@@ -194,27 +199,27 @@ function Report() {
         if (assigmentRatings?.length) {
           row.push(assigmentAvg);
         }
-        
+
         [...controlRatings].forEach((value) => {
           row.push(value);
         });
-        
+
         if (controlRatings?.length) {
           row.push(controlAvg);
         }
-        
+
         // Добавляем среднее по группе
         const groupAvg = groupData?.groupAvg || '';
         row.push(groupAvg);
         console.log(row);
-        
+
       });
-    
+
       // Добавляем среднее по всем группам
       row.push(rowData.avg_groups || '');
       sheetData.push(row);
     });
-    
+
     // Генерация Excel-файла
     const ws = XLSX.utils.aoa_to_sheet(sheetData);
     const wb = XLSX.utils.book_new();
@@ -245,6 +250,8 @@ function Report() {
     if (reportData?.report) {
       setReport(reportData?.report);
       setGroups(reportData?.groups);
+      setTotalStats(reportData?.totalStats)
+      setGroupsStats(reportData?.groupStats)
     } else {
       if (!isLoadingReport) {
         toast.current.show({
@@ -266,7 +273,7 @@ function Report() {
           rounded
         />
         <div className="text-xl font-bold">
-          {reportTypes?.find(({value}) => value === reportData?.reportType)?.name || ''}, {reportData?.subject}, {reportData?.schoolClass}
+          {reportTypes?.find(({ value }) => value === reportData?.reportType)?.name || ''}, {reportData?.subject}, {reportData?.schoolClass}
         </div>
       </div>
       <DataTable
@@ -320,6 +327,63 @@ function Report() {
           field="avg_groups"
         />
       </DataTable>
+      <div className='grid'>
+        {Object?.entries(groupsStats || {})?.map(([key, value]) => {
+          console.log(value);
+
+          return (
+            <div className='col-6'>
+              <div className='shadow-1 border-round-2xl border-200 border-1 p-5'>
+                <h2 className='text-2xl font-bold'>{key}</h2>
+                <div className='flex gap-4'>
+                  <Chart type="doughnut" data={{
+                    labels: [
+                      `Початковий - ${value.start?.count} (${value.start?.percent}%)`,
+                      `Середній - ${value.avg?.count} (${value.avg?.percent}%)`,
+                      `Достатній - ${value.sufficient?.count} (${value.sufficient?.percent}%)`,
+                      `Високий - ${value.high?.count} (${value.high?.percent}%)`
+                    ],
+                    datasets: [
+                      {
+                        data: [value.start?.count, value.avg?.count, value.sufficient?.count, value.high?.count],
+                        backgroundColor: [
+                          documentStyle.getPropertyValue('--red-500'),
+                          documentStyle.getPropertyValue('--yellow-500'),
+                          documentStyle.getPropertyValue('--blue-500'),
+                          documentStyle.getPropertyValue('--green-500'),
+
+                        ],
+                        hoverBackgroundColor: [
+                          documentStyle.getPropertyValue('--red-400'),
+                          documentStyle.getPropertyValue('--yellow-400'),
+                          documentStyle.getPropertyValue('--blue-400'),
+                          documentStyle.getPropertyValue('--green-400'),
+                        ]
+                      }
+                    ]
+                  }} options={{
+                    plugins: {
+                      legend: {
+                        labels: {
+                          usePointStyle: true
+                        }
+                      }
+                    }
+                  }} className="w-full md:w-30rem" />
+                  <div className='flex flex-column gap-2'>
+                    <h3 className='text-xl font-bold m-0'>Середня оцінка: {value.avgGroup}</h3>
+                    <h3 className='text-lg font-bold m-0'><span className='text-red-500'>Початковий</span> - {value.start?.count} ({value.start?.percent}%)</h3>
+                    <h3 className='text-lg font-bold m-0'><span className='text-yellow-500'>Середній</span> - {value.avg?.count} ({value.avg?.percent}%)</h3>
+                    <h3 className='text-lg font-bold m-0'><span className='text-blue-500'>Достатній</span> - {value.sufficient?.count} ({value.sufficient?.percent}%)</h3>
+                    <h3 className='text-lg font-bold m-0'><span className='text-green-500'>Високий</span> - {value.high?.count} ({value.high?.percent}%)</h3>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   );
 }
