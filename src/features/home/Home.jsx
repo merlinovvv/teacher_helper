@@ -14,12 +14,16 @@ function Home() {
   const { data: userData, mutate: getUserData, isSuccess: userDataSuccess } = useGetUser()
 
   useEffect(() => {
-    if (paymentsData) {
-      console.log(paymentsData);
+    console.log(paymentsData);
+    
+    if (paymentsData && !isLoadingPayments) {
+      console.log(paymentsData?.user);
       
       if (pathname !== '/' && pathname !== '/authorize' && !isLogin) {
         navigate('/authorize');
-      } else if (isLogin && !paymentsData?.user && pathname !== '/payment' && pathname !== '/') {
+      } else if (isLogin && (!paymentsData?.user && !isLoadingPayments) && pathname !== '/payment' && pathname !== '/') {    
+        console.log((!paymentsData?.user && !isLoadingPayments));
+        
         navigate('/payment');
       } else {
         if (!userData) {
@@ -27,7 +31,7 @@ function Home() {
         }
       }
     }
-  }, [pathname, paymentsData]);
+  }, [pathname, paymentsData, isLoadingPayments]);
 
   useEffect(() => {
     if (userDataSuccess && userData) {

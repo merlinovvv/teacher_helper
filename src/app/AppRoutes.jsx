@@ -6,6 +6,7 @@ import GradesByGroupsSettings from '../features/gradesByGroups/gradesByGroupsSet
 import Report from '../features/gradesByGroups/gradesByGroupsReports/components/Report/Report.jsx';
 import Payment from '../features/payment/Payment.jsx';
 import Authorize from '../features/authorize/Authorize.jsx';
+import Users from '../features/users/Users.jsx';
 
 function AppRoutes() {
   const router = createBrowserRouter(
@@ -43,6 +44,10 @@ function AppRoutes() {
               },
             ],
           },
+          {
+            path: 'users',
+            element: <Users />
+          }
         ],
       },
       {
@@ -51,7 +56,7 @@ function AppRoutes() {
       },
       {
         path: 'authorize',
-        element: <Authorize/>
+        element: <Authorize />
       },
     ],
     {

@@ -5,7 +5,7 @@ import Item from '../Item/Item';
 import { LayoutContext } from '../../../../../context/LayoutContext';
 
 export default function SidebarContent({ closeIconRef, hide }) {
-    const { sidebarIsOpen, setSidebarIsOpen } = useContext(LayoutContext);
+    const { sidebarIsOpen, setSidebarIsOpen, role } = useContext(LayoutContext);
     const [sidebarStyles, setSidebarStyles] = useState();
 
     useEffect(() => {
@@ -43,15 +43,19 @@ export default function SidebarContent({ closeIconRef, hide }) {
                             <img style={{ maxWidth: 35 }} src="/logo.svg" alt="" />
                             Grades Helper
                         </span>
-                        <span style={{top: 10, right: 10}} className='lg:hidden absolute'>
+                        <span style={{ top: 10, right: 10 }} className='lg:hidden absolute'>
                             <Button type="button" ref={closeIconRef} onClick={(e) => hide(e)} icon="pi pi-times" rounded outlined className="h-2rem w-2rem"></Button>
                         </span>
                     </div>
 
                     <div className="overflow-y-auto">
-                        <Category title="Меню">
+                        <Category access={true} title="Меню">
                             <Item to="grades-by-groups" title="Оцінки за групами" />
                         </Category>
+                        <Category access={role === 'admin'} title="Адмін">
+                            <Item to="users" title="Користувачі" />
+                        </Category>
+
                     </div>
                 </div>
             </div>

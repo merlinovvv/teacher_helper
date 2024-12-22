@@ -1,7 +1,8 @@
-import React, { createContext, useRef, useState } from 'react';
+import React, { createContext, useEffect, useRef, useState } from 'react';
 import { ConfirmPopup } from 'primereact/confirmpopup';
 import { Toast } from 'primereact/toast';
 import { checkToken } from '../shared/utils/utils.js';
+import { jwtDecode } from 'jwt-decode';
 
 export const LayoutContext = createContext(); // Создаём контекст
 
@@ -11,7 +12,18 @@ function LayoutProvider({ children }) {
   const [globalTitle, setGlobalTitle] = useState('');
   const [isLogin, setIsLogin] = useState(checkToken(localStorage.getItem('access_token')));
   const [accessToken, setAccessToken] = useState(localStorage.getItem('access_token'));
+  const [role, setRole] = useState()
   const toast = useRef(null);
+
+  useEffect(() => {
+    if (localStorage.getItem('access_token')) {
+      const decodeToken = jwtDecode(localStorage.getItem('access_token'));
+      if (decodeToken?.user_role === 'admin') {
+        setRole('admin')
+      }
+    }
+  }, [localStorage.getItem('access_token')])
+
   return (
     <LayoutContext.Provider
       value={{
@@ -25,7 +37,8 @@ function LayoutProvider({ children }) {
         setAccessToken,
         accessToken,
         login,
-        setLogin
+        setLogin,
+        role
       }}
     >
       <ConfirmPopup />

@@ -2,9 +2,10 @@ import React, { useRef } from 'react';
 import { StyleClass } from 'primereact/styleclass';
 import { Ripple } from 'primereact/ripple';
 
-function Category({ children, title }) {
+function Category({ children, title, access }) {
   const btnRef = useRef();
   return (
+    access &&
     <ul className="list-none p-3 m-0">
       <li>
         <StyleClass
