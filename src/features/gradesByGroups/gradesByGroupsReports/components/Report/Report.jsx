@@ -35,7 +35,7 @@ function Report() {
   const headerGroup = (
     <ColumnGroup>
       <Row>
-        <Column frozen={true} alignFrozen="left" headerClassName="bg-blue-700 text-white text-center" header="ПІБ" rowSpan={3} />
+        <Column frozen={report?.length && groups?.length} headerClassName="bg-blue-700 text-white text-center" header="ПІБ" rowSpan={3} />
         {groups?.map(({ name, control_dates, assigment_dates }, index) => {
           return [
             <Column key={name} header={`${name}`} colSpan={(control_dates?.length && assigment_dates?.length) ? (control_dates?.length + 1 + assigment_dates?.length + 1) : assigment_dates?.length ? assigment_dates?.length + 1 : control_dates?.length ? control_dates?.length + 1 : 0} />,
@@ -50,13 +50,13 @@ function Report() {
           if (assigment_dates?.length) {
             returnColumns.push(
               <Column key={`${_id}-assigment`} header="Поточне оцінювання" colSpan={assigment_dates?.length || 1} />,
-              <Column headerClassName="bg-cyan-600 text-white text-center" key={`avg-control`} header={`Середнє за поточні`} rowSpan={2} />,
+              <Column headerClassName="bg-cyan-600 text-white text-center" key={`${_id}-avg-assigment`} header={`Середнє за поточні`} rowSpan={2} />,
             );
           }
           if (control_dates?.length) {
             returnColumns.push(
               <Column key={`${_id}-control`} header="Підсумкові" colSpan={control_dates?.length} />,
-              <Column headerClassName="bg-yellow-600 text-white text-center" key={`avg-control`} header={`Середнє за підсумкові`} rowSpan={2} />,
+              <Column headerClassName="bg-yellow-600 text-white text-center" key={`${_id}-avg-control`} header={`Середнє за підсумкові`} rowSpan={2} />,
             );
           }
           return returnColumns;
@@ -281,7 +281,7 @@ function Report() {
         header={renderHeader}
         filters={filters}
         globalFilterFields={['name']}
-        style={sidebarIsOpen && { width: reportWidth }}
+        style={sidebarIsOpen ? { width: reportWidth } : undefined}
         scrollable
         scrollHeight="780px"
         headerColumnGroup={headerGroup}
@@ -289,35 +289,35 @@ function Report() {
         loading={isLoadingReport}
         value={report || []}
       >
-        <Column frozen={true} alignFrozen="left" bodyClassName="bg-blue-900 text-white" header="ПІБ" field="name" />
+        <Column frozen bodyClassName="bg-blue-900 text-white" header="ПІБ" field="name" />
         {groups?.flatMap(({ _id, name, control_dates, assigment_dates }, i) => [
           ...assigment_dates?.flatMap((date, index) => (
             <Column
-              key={`${name}-assigment-${index}`}
+              key={`${_id}-assigment-${index}`}
               body={(rowData) => renderGroupData(rowData, name, date, 'assigment')}
             />
           )),
           <Column
             hidden={!assigment_dates?.length}
             bodyClassName="bg-cyan-300 text-cyan-800 font-bold text-center text-lg"
-            key={`${name}-assigment-avg`}
+            key={`${_id}-assigment-avg`}
             body={(rowData) => renderGroupData(rowData, name, '', 'assigment')}
           />,
           ...control_dates?.flatMap((date, index) => (
             <Column
-              key={`${name}-control-${index}`}
+              key={`${_id}-control-${index}`}
               body={(rowData) => renderGroupData(rowData, name, date, 'control')}
             />
           )),
           <Column
             hidden={!control_dates?.length}
             bodyClassName="bg-yellow-300 text-yellow-800 font-bold text-center text-lg"
-            key={`${name}-control-avg`}
+            key={`${_id}-control-avg`}
             body={(rowData) => renderGroupData(rowData, name, '', 'control')}
           />,
           <Column
             bodyClassName="bg-green-300 text-green-800 font-bold text-center text-lg"
-            key={`${name}-avg`}
+            key={`${_id}-avg`}
             body={(rowData) => rowData.groups?.find(({ group }) => name === group)?.groupAvg}
           />,
         ])}
@@ -332,7 +332,7 @@ function Report() {
           console.log(value);
 
           return (
-            <div className='col-6'>
+            <div key={key} className='col-6'>
               <div className='shadow-1 border-round-2xl border-200 border-1 p-5'>
                 <h2 className='text-2xl font-bold'>{key}</h2>
                 <div className='flex gap-4'>
