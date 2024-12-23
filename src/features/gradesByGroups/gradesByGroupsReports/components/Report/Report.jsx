@@ -35,7 +35,7 @@ function Report() {
   const headerGroup = (
     <ColumnGroup>
       <Row>
-        <Column headerClassName="bg-blue-700 text-white text-center" header="ПІБ" rowSpan={3} />
+        <Column frozen={true} alignFrozen="left" headerClassName="bg-blue-700 text-white text-center" header="ПІБ" rowSpan={3} />
         {groups?.map(({ name, control_dates, assigment_dates }, index) => {
           return [
             <Column key={name} header={`${name}`} colSpan={(control_dates?.length && assigment_dates?.length) ? (control_dates?.length + 1 + assigment_dates?.length + 1) : assigment_dates?.length ? assigment_dates?.length + 1 : control_dates?.length ? control_dates?.length + 1 : 0} />,
@@ -289,7 +289,7 @@ function Report() {
         loading={isLoadingReport}
         value={report || []}
       >
-        <Column bodyClassName="bg-blue-900 text-white" header="ПІБ" field="name" />
+        <Column frozen={true} alignFrozen="left" bodyClassName="bg-blue-900 text-white" header="ПІБ" field="name" />
         {groups?.flatMap(({ _id, name, control_dates, assigment_dates }, i) => [
           ...assigment_dates?.flatMap((date, index) => (
             <Column
